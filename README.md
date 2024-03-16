@@ -10,7 +10,7 @@ The chatbot consists of two main components:
 
 1. `gpt.py`: This file contains the core functionality of the chatbot, including the integration with the Matrix protocol and the LLM models from Perplexity AI.
 
-2. `bot.py`: This file implements additional features such as user registration, token management, and email sending capabilities.
+2. `bot.py`: This file implements another chatbot, which implements user invitation to a restricted matrix server as well as token management, and email sending capabilities.
 
 The chatbot can handle various commands, including:
 

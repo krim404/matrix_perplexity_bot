@@ -1,0 +1,13 @@
+# Apple-Metadaten
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+
+# Thumbnails
+._*
+Thumbs.db
+
+# Virtuelle Umgebung
+venv/
+env

@@ -1,0 +1,10 @@
+pyllamacpp
+langchain[llm]~=0.1.12
+matrix-nio
+python-olm
+markdown~=3.5.2
+nio~=3.4.2
+requests~=2.31.0
+cachetools
+atomicwrites
+peewee

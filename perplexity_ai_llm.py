@@ -9,6 +9,7 @@ from typing import List, Optional, Any
 class PerplexityAILLM(BaseLLM):
     api_key: str
     model_name: str
+    prefix: str = "Du bist ein persönlicher Assistent. Antworte immer so präzise wie möglich und ausschließlich auf deutsch. Übersetze alle englischen texte und antworten bevor du diese sendest. Schreibe lange Antworten wenn möglich. Sei immer höflich und gib immer die Quellen für deine Antwort mit an. Diskutiere nicht, im zweifel hat der Benutzer immer recht"
 
     def call_perplexity_ai(self, prompt: str) -> LLMResult:
         url = "https://api.perplexity.ai/chat/completions"
@@ -18,7 +19,7 @@ class PerplexityAILLM(BaseLLM):
             "messages": [
                 {
                     "role": "system",
-                    "content": "Du bist ein persönlicher Assistent. Antworte immer so präzise wie möglich und immer auf deutsch. Schreibe lange Antworten wenn möglich. Sei immer höflich und gib immer die Quellen für deine Antwort mit an. Diskutiere nicht, im zweifel hat der Benutzer immer recht"
+                    "content": self.prefix
                 },
                 {
                     "role": "user",

@@ -22,7 +22,7 @@ class ChatBot(object):
     user_id = None
 
     def __init__(self):
-        logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+        logging.basicConfig(level=logging.WARN, format='%(asctime)s - %(levelname)s - %(message)s')
         logging.debug("Starting Bot")
         self.prompt_prefix = "Du bist ein persönlicher Assistent. Antworte immer so präzise wie möglich und immer auf deutsch. Schreibe lange Antworten wenn möglich. Sei immer höflich und gib immer die Quellen für deine Antwort mit an. Diskutiere nicht, im zweifel hat der Benutzer immer recht"
         self.homeserver = os.environ.get('HOMESERVER', None)
@@ -43,9 +43,9 @@ class ChatBot(object):
         self.prompt = PromptTemplate(template=self.template, input_variables=['input', 'history', 'prefix'])
         self.history = ''
         self.keep_dialogues = self.ctx // self.n_predict  # Calculate how many dialogues to keep in memory.
-        self.llm = PerplexityAILLM(api_key=self.apikey, model_name="sonar-medium-online")
-        self.llmo = PerplexityAILLM(api_key=self.apikey, model_name="sonar-medium-chat")
-        self.llmp = PerplexityAILLM(api_key=self.apikey, model_name="codellama-70b-instruct")
+        self.llm = PerplexityAILLM(api_key=self.apikey, model_name="sonar-medium-online", prefix=self.prompt_prefix)
+        self.llmo = PerplexityAILLM(api_key=self.apikey, model_name="sonar-medium-chat", prefix=self.prompt_prefix)
+        self.llmp = PerplexityAILLM(api_key=self.apikey, model_name="codellama-70b-instruct", prefix=self.prompt_prefix)
     async def run(self):
         """Connect to the homeserver and start listening for messages."""
 

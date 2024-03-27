@@ -8,7 +8,6 @@ RUN pip install -r requirements.txt
 COPY perplexity_ai_llm.py /opt/
 COPY run.sh /opt/
 RUN chmod -R 777 /opt/run.sh
-
 COPY gpt.py /opt/
 COPY bot.py /opt/
 

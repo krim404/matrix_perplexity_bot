@@ -1,0 +1,36 @@
+stages:
+  - build
+  - scan
+  - push
+
+variables:
+  IMAGE_NAME: $CI_REGISTRY_IMAGE:$CI_COMMIT_REF_SLUG
+
+build:
+  stage: build
+  image: docker:20.10.16
+  services:
+    - docker:20.10.16-dind
+  script:
+    - docker build -t $IMAGE_NAME .
+  rules:
+    - if: $CI_COMMIT_BRANCH
+
+trivy_scan:
+  stage: scan
+  image: 
+    name: aquasec/trivy:latest
+    entrypoint: [""]
+  script:
+    - trivy image --exit-code 1 --severity HIGH,CRITICAL $IMAGE_NAME
+  allow_failure: true
+  rules:
+    - if: $CI_COMMIT_BRANCH
+
+push:
+  stage: push
+  script:
+    - docker login -u $HARBOR_USERNAME -p $HARBOR_PASSWORD $HARBOR_HOST
+    - docker push $IMAGE_NAME
+  rules:
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH

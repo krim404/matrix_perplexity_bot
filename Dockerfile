@@ -1,4 +1,4 @@
-FROM python:3.9
+FROM registry.krim.dev/proxy/library/python:3.9
 
 COPY requirements.txt /opt/
 

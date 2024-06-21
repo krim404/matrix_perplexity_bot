@@ -1,6 +1,8 @@
 stages:
   - build
   - scan
+  - code_quality
+  - safety
   - push
 
 variables:
@@ -23,6 +25,28 @@ trivy_scan:
     entrypoint: [""]
   script:
     - trivy image --exit-code 1 --severity HIGH,CRITICAL $IMAGE_NAME
+  allow_failure: true
+  rules:
+    - if: $CI_COMMIT_BRANCH
+
+code_quality:
+  stage: code_quality
+  image: python:3.9
+  before_script:
+    - pip install flake8
+  script:
+    - flake8 .
+  allow_failure: true
+  rules:
+    - if: $CI_COMMIT_BRANCH
+
+safety:
+  stage: safety
+  image: python:3.9
+  before_script:
+    - pip install safety
+  script:
+    - safety check
   allow_failure: true
   rules:
     - if: $CI_COMMIT_BRANCH

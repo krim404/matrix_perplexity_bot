@@ -31,7 +31,7 @@ trivy_scan:
 
 code_quality:
   stage: code_quality
-  image: python:3.9
+  image: python:3.12
   before_script:
     - pip install flake8
   script:
@@ -42,7 +42,7 @@ code_quality:
 
 safety:
   stage: safety
-  image: python:3.9
+  image: python:3.12
   before_script:
     - pip install safety
   script:

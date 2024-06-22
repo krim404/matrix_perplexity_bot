@@ -1,5 +1,5 @@
 pyllamacpp
-langchain[llm]~=0.1.12
+langchain[llm]~=0.2.5
 matrix-nio
 python-olm
 markdown~=3.5.2

@@ -4,7 +4,7 @@ matrix-nio
 python-olm
 markdown~=3.5.2
 nio~=3.4.2
-requests~=2.31.0
+requests~=2.32.3
 cachetools
 atomicwrites
 peewee

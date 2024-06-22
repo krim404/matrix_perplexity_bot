@@ -10,9 +10,9 @@ variables:
 
 build:
   stage: build
-  image: docker:20.10.16
+  image: docker:20.10.24
   services:
-    - docker:20.10.16-dind
+    - docker:20.10.24-dind
   script:
     - docker build -t $IMAGE_NAME .
   rules:

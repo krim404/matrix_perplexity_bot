@@ -3,20 +3,17 @@ stages:
   - scan
   - code_quality
   - safety
-  - push
 
-variables:
-  IMAGE_NAME: $CI_REGISTRY_IMAGE:$CI_COMMIT_REF_SLUG
-
-build:
-  stage: build
+build-and-push:
   image: docker:26.1.4
+  stage: build
   services:
     - docker:26.1.4-dind
+  before_script:
+    - docker login -u $HARBOR_USERNAME -p $HARBOR_PASSWORD $HARBOR_HOST
   script:
-    - docker build -t $IMAGE_NAME .
-  rules:
-    - if: $CI_COMMIT_BRANCH
+    - docker buildx create --use
+    - docker buildx build --platform linux/amd64,linux/arm64 -t $CI_REGISTRY_IMAGE:latest --push .
 
 trivy_scan:
   stage: scan
@@ -50,11 +47,3 @@ safety:
   allow_failure: true
   rules:
     - if: $CI_COMMIT_BRANCH
-
-push:
-  stage: push
-  script:
-    - docker login -u $HARBOR_USERNAME -p $HARBOR_PASSWORD $HARBOR_HOST
-    - docker push $IMAGE_NAME
-  rules:
-    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH

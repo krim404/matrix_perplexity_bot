@@ -12,8 +12,7 @@ build-and-push:
   before_script:
     - docker login -u $HARBOR_USERNAME -p $HARBOR_PASSWORD $HARBOR_HOST
   script:
-    - docker buildx create --use --driver docker-container
-    - docker buildx build --platform linux/amd64 -t $CI_REGISTRY_IMAGE:latest --push .
+    - docker build -t $CI_REGISTRY_IMAGE:latest --push .
 
 trivy_scan:
   stage: scan

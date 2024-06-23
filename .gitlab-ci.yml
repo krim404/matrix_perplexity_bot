@@ -20,7 +20,7 @@ trivy_scan:
     name: aquasec/trivy:latest
     entrypoint: [""]
   script:
-    - trivy image --exit-code 1 --ignore-unfixed --severity HIGH,CRITICAL $IMAGE_NAME
+    - trivy image --exit-code 1 --ignore-unfixed --severity HIGH,CRITICAL $CI_REGISTRY_IMAGE:latest
   allow_failure: true
   rules:
     - if: $CI_COMMIT_BRANCH

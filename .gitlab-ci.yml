@@ -12,7 +12,7 @@ build-and-push:
   before_script:
     - docker login -u $HARBOR_USERNAME -p $HARBOR_PASSWORD $HARBOR_HOST
   script:
-    - docker build -t $CI_REGISTRY_IMAGE:latest --push .
+    - docker build -t $HARBOR_HOST/library/$CI_PROJECT_NAME:latest --push .
 
 trivy_scan:
   stage: scan
@@ -20,7 +20,7 @@ trivy_scan:
     name: aquasec/trivy:latest
     entrypoint: [""]
   script:
-    - trivy image --exit-code 1 --ignore-unfixed --severity HIGH,CRITICAL $CI_REGISTRY_IMAGE:latest
+    - trivy image --exit-code 1 --ignore-unfixed --severity HIGH,CRITICAL $HARBOR_HOST/library/$CI_PROJECT_NAME:latest
   allow_failure: true
   rules:
     - if: $CI_COMMIT_BRANCH

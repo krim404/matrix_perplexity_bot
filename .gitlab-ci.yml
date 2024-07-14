@@ -3,16 +3,18 @@ stages:
   - scan
   - code_quality
   - safety
+  - push
 
-build-and-push:
+variables:
+  IMAGE_NAME: $HARBOR_HOST/library/$CI_PROJECT_NAME
+
+build:
   image: docker:27.0.3
   stage: build
   services:
     - docker:27.0.3-dind
-  before_script:
-    - docker login -u $HARBOR_USERNAME -p $HARBOR_PASSWORD $HARBOR_HOST
   script:
-    - docker build -t $HARBOR_HOST/library/$CI_PROJECT_NAME:latest --push .
+    - docker build -t $IMAGE_NAME:$CI_COMMIT_REF_SLUG -t $IMAGE_NAME:latest .
 
 trivy_scan:
   stage: scan
@@ -20,7 +22,7 @@ trivy_scan:
     name: aquasec/trivy:latest
     entrypoint: [""]
   script:
-    - trivy image --exit-code 1 --ignore-unfixed --severity HIGH,CRITICAL $HARBOR_HOST/library/$CI_PROJECT_NAME:latest
+    - trivy image --exit-code 1 --ignore-unfixed --severity HIGH,CRITICAL $IMAGE_NAME:latest
   allow_failure: true
   rules:
     - if: $CI_COMMIT_BRANCH
@@ -46,3 +48,12 @@ safety:
   allow_failure: true
   rules:
     - if: $CI_COMMIT_BRANCH
+
+push:
+  stage: push
+  before_script:
+    - docker login -u $HARBOR_USERNAME -p $HARBOR_PASSWORD $HARBOR_HOST
+  script:
+    - docker push --all-tags $IMAGE_NAME
+  rules:
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH

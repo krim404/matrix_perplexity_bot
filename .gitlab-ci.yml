@@ -5,10 +5,10 @@ stages:
   - safety
 
 build-and-push:
-  image: docker:26.1.4
+  image: docker:27.0.3
   stage: build
   services:
-    - docker:26.1.4-dind
+    - docker:27.0.3-dind
   before_script:
     - docker login -u $HARBOR_USERNAME -p $HARBOR_PASSWORD $HARBOR_HOST
   script:

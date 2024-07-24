@@ -9,10 +9,10 @@ variables:
   IMAGE_NAME: $HARBOR_HOST/library/$CI_PROJECT_NAME
 
 build:
-  image: docker:27.0.3
+  image: docker:27.1.1
   stage: build
   services:
-    - docker:27.0.3-dind
+    - docker:27.1.1-dind
   script:
     - docker build -t $IMAGE_NAME:$CI_COMMIT_REF_SLUG -t $IMAGE_NAME:latest .
 
@@ -51,7 +51,7 @@ safety:
 
 push:
   stage: push
-  image: docker:27.0.3
+  image: docker:27.1.1
   before_script:
     - docker login -u $HARBOR_USERNAME -p $HARBOR_PASSWORD $HARBOR_HOST
   script:

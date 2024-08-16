@@ -2,7 +2,7 @@ pyllamacpp
 langchain[llm]~=0.2.5
 matrix-nio
 python-olm
-markdown~=3.6.0
+markdown~=3.7.0
 nio~=3.4.2
 requests~=2.32.3
 cachetools

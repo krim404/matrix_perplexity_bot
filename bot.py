@@ -42,15 +42,16 @@ class ChatBot(object):
         self._last_event = time.time() * 1000
 
         self.prompt_prefix = "Du bist ein persönlicher Assistent. Antworte immer so präzise wie möglich und ausschließlich auf deutsch. Übersetze alle englischen texte und antworten bevor du diese sendest. Schreibe lange Antworten wenn möglich. Sei immer höflich und gib immer die Quellen für deine Antwort mit an. Diskutiere nicht, im zweifel hat der Benutzer immer recht"
-        self.prompt_prefix_plex = "Du bist eine Suchmaschine für Filme und Serien, der Nutzer gibt dir den Titel zu dieser. Du willst so kurz wie möglich und ausschließlich auf deutsch antworten. Übersetze alle englischen texte und antworten bevor du diese sendest. Du suchst vorher immer im Internet nach dem Link zu entweder der imdb.com oder thetvdb.com der Information mit jeweils einem kurzen deutschen teaser text"
+        self.prompt_prefix_plex = "Du bist eine Suchmaschine für Filme und Serien, der Nutzer gibt dir den Titel zu einer Serie oder einem Film als Eingabe. Du willst so kurz wie möglich und ausschließlich auf deutsch antworten. Übersetze alle englischen texte und antworten bevor du diese sendest. Du suchst vorher immer im Internet nach dem Link zu entweder der imdb.com oder thetvdb.com der Information mit jeweils einem kurzen deutschen teaser text"
         self.template = '{prefix}\n{history}\n---\nPerson: {input}\nRobot:'
         self.prompt = PromptTemplate(template=self.template, input_variables=['input', 'history', 'prefix'])
         self.history = ''
         self.keep_dialogues = self.ctx // self.n_predict  # Calculate how many dialogues to keep in memory.
-        self.llm = PerplexityAILLM(api_key=self.apikey, model_name="llama-3.1-sonar-large-128k-online", prefix=self.prompt_prefix)
-        self.llmo = PerplexityAILLM(api_key=self.apikey, model_name="llama-3.1-sonar-large-128k-chat", prefix=self.prompt_prefix)
-        self.llmp = PerplexityAILLM(api_key=self.apikey, model_name="codellama-70b-instruct", prefix=self.prompt_prefix)
-        self.llmplex = PerplexityAILLM(api_key=self.apikey, model_name="llama-3.1-sonar-large-128k-online", prefix=self.prompt_prefix_plex)
+        
+        self.llm = PerplexityAILLM(api_key=self.apikey, model_name="R1-1776", prefix=self.prompt_prefix)
+        self.llmo = PerplexityAILLM(api_key=self.apikey, model_name="sonar", prefix=self.prompt_prefix)
+        self.llmp = PerplexityAILLM(api_key=self.apikey, model_name="sonar-pro", prefix=self.prompt_prefix)
+        self.llmplex = PerplexityAILLM(api_key=self.apikey, model_name="sonar", prefix=self.prompt_prefix_plex)
 
         self.bot = niobot.NioBot(
             homeserver=self.homeserver,
@@ -88,9 +89,8 @@ class ChatBot(object):
             latency_ms = self.bot.latency(ctx.message)
             await ctx.respond("Pong! Latency: {:.2f}ms".format(latency_ms))
 
-        @self.bot.command(name="search", greedy=True)
-        async def search(ctx: niobot.Context):
-            question = " ".join(ctx.args)
+        @self.bot.command(name="search")
+        async def search(ctx: niobot.Context, *, question: str):
             result = self.conversationplex.predict(
                 input=question,
                 history="Bitte suche die folgende Serie / Film auf imdb oder thetvdb, antworte mir ausschließlich auf Deutsch. Wenn du einen englischen Text findest, übersetze diesen vorher auf deutsch. Wenn du nicht direkt etwas findest, liste mindestens fünf Elemente auf, die eventuell damit gemeint sein könnten. Suche hierzu im Internet",
@@ -100,10 +100,8 @@ class ChatBot(object):
             response = result.split('\nRobot: ')[-1].replace('---', '')
             await ctx.respond(response)
 
-        @self.bot.command(name="online", greedy=True)
-        async def online(ctx: niobot.Context):
-            question = " ".join(ctx.args)
-
+        @self.bot.command(name="online")
+        async def online(ctx: niobot.Context, *, question: str):
             result = self.conversation.predict(
                 input=question,
                 history=self.history.replace(self.prompt_prefix, ''),  # Remove prefix from history
@@ -118,10 +116,8 @@ class ChatBot(object):
 
             await ctx.respond(response)
 
-        @self.bot.command(name="chat", greedy=True)
-        async def chat(ctx: niobot.Context):
-            question = " ".join(ctx.args)
-
+        @self.bot.command(name="chat")
+        async def chat(ctx: niobot.Context, *, question: str):
             result = self.conversationo.predict(
                 input=question,
                 history=self.history.replace(self.prompt_prefix, ''),  # Remove prefix from history
@@ -136,10 +132,8 @@ class ChatBot(object):
 
             await ctx.respond(response)
 
-        @self.bot.command(name="devel", greedy=True)
-        async def devel(ctx: niobot.Context):
-            question = " ".join(ctx.args)
-
+        @self.bot.command(name="devel")
+        async def devel(ctx: niobot.Context, *, question: str):
             result = self.conversationp.predict(
                 input=question,
                 history=self.history.replace(self.prompt_prefix, ''),  # Remove prefix from history

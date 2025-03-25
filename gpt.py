@@ -43,9 +43,9 @@ class ChatBot(object):
         self.prompt = PromptTemplate(template=self.template, input_variables=['input', 'history', 'prefix'])
         self.history = ''
         self.keep_dialogues = self.ctx // self.n_predict  # Calculate how many dialogues to keep in memory.
-        self.llm = PerplexityAILLM(api_key=self.apikey, model_name="llama-3.1-sonar-large-128k-online", prefix=self.prompt_prefix)
-        self.llmo = PerplexityAILLM(api_key=self.apikey, model_name="llama-3.1-sonar-large-128k-chat", prefix=self.prompt_prefix)
-        self.llmp = PerplexityAILLM(api_key=self.apikey, model_name="codellama-70b-instruct", prefix=self.prompt_prefix)
+        self.llm = PerplexityAILLM(api_key=self.apikey, model_name="R1-1776", prefix=self.prompt_prefix)
+        self.llmo = PerplexityAILLM(api_key=self.apikey, model_name="sonar", prefix=self.prompt_prefix)
+        self.llmp = PerplexityAILLM(api_key=self.apikey, model_name="sonar-pro", prefix=self.prompt_prefix)
     async def run(self):
         """Connect to the homeserver and start listening for messages."""
 

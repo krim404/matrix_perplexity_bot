@@ -13,10 +13,6 @@ import niobot
 from datetime import datetime, timezone
 from niobot import utils
 
-from perplexity_ai_llm import PerplexityAILLM
-from langchain.prompts import PromptTemplate
-from langchain.chains import LLMChain
-
 class ChatBot(object):
     homeserver = None
     user_id = None
@@ -41,17 +37,8 @@ class ChatBot(object):
         self._synced = False
         self._last_event = time.time() * 1000
 
-        self.prompt_prefix = "Du bist ein persönlicher Assistent. Antworte immer so präzise wie möglich und ausschließlich auf deutsch. Übersetze alle englischen texte und antworten bevor du diese sendest. Schreibe lange Antworten wenn möglich. Sei immer höflich und gib immer die Quellen für deine Antwort mit an. Diskutiere nicht, im zweifel hat der Benutzer immer recht"
-        self.prompt_prefix_plex = "Du bist eine Suchmaschine für Filme und Serien, der Nutzer gibt dir den Titel zu einer Serie oder einem Film als Eingabe. Du willst so kurz wie möglich und ausschließlich auf deutsch antworten. Übersetze alle englischen texte und antworten bevor du diese sendest. Du suchst vorher immer im Internet nach dem Link zu entweder der imdb.com oder thetvdb.com der Information mit jeweils einem kurzen deutschen teaser text"
-        self.template = '{prefix}\n{history}\n---\nPerson: {input}\nRobot:'
-        self.prompt = PromptTemplate(template=self.template, input_variables=['input', 'history', 'prefix'])
         self.history = ''
         self.keep_dialogues = self.ctx // self.n_predict  # Calculate how many dialogues to keep in memory.
-        
-        self.llm = PerplexityAILLM(api_key=self.apikey, model_name="R1-1776", prefix=self.prompt_prefix)
-        self.llmo = PerplexityAILLM(api_key=self.apikey, model_name="sonar", prefix=self.prompt_prefix)
-        self.llmp = PerplexityAILLM(api_key=self.apikey, model_name="sonar-pro", prefix=self.prompt_prefix)
-        self.llmplex = PerplexityAILLM(api_key=self.apikey, model_name="sonar", prefix=self.prompt_prefix_plex)
 
         self.bot = niobot.NioBot(
             homeserver=self.homeserver,
@@ -74,79 +61,15 @@ class ChatBot(object):
         self.template = '{prefix}\n{history}\n---\nPerson: {input}\nRobot:'
         self.history = ''
 
-        self.conversation = LLMChain(llm=self.llm, prompt=self.prompt)
-        self.conversationo = LLMChain(llm=self.llmo, prompt=self.prompt)
-        self.conversationp = LLMChain(llm=self.llmp, prompt=self.prompt)
-        self.conversationplex = LLMChain(llm=self.llmplex, prompt=self.prompt)
-
-        @self.bot.command(name="reset")
-        async def reset(ctx: niobot.Context):
-            self.history = 'Bitte antworte mir nur auf deutsch:'
-            await ctx.respond("History gelöscht, wir fangen von vorne an")
+       
         @self.bot.command(name="ping")
         async def ping(ctx: niobot.Context):
             """Shows the latency between events"""
             latency_ms = self.bot.latency(ctx.message)
             await ctx.respond("Pong! Latency: {:.2f}ms".format(latency_ms))
 
-        @self.bot.command(name="search")
-        async def search(ctx: niobot.Context, *, question: str):
-            result = self.conversationplex.predict(
-                input=question,
-                history="Bitte suche die folgende Serie / Film auf imdb oder thetvdb, antworte mir ausschließlich auf Deutsch. Wenn du einen englischen Text findest, übersetze diesen vorher auf deutsch. Wenn du nicht direkt etwas findest, liste mindestens fünf Elemente auf, die eventuell damit gemeint sein könnten. Suche hierzu im Internet",
-                prefix=self.prompt_prefix
-            )
-
-            response = result.split('\nRobot: ')[-1].replace('---', '')
-            await ctx.respond(response)
-
-        @self.bot.command(name="online")
-        async def online(ctx: niobot.Context, *, question: str):
-            result = self.conversation.predict(
-                input=question,
-                history=self.history.replace(self.prompt_prefix, ''),  # Remove prefix from history
-                prefix=self.prompt_prefix
-            )
-
-            # Do some formatting and cleanup. This is not too pretty, but it works.
-            response = result.split('\nRobot: ')[-1].replace('---', '')
-            # Update history with the updated prompt.
-            self.history = '\nPerson:'.join(result.split('\nPerson:')[-self.keep_dialogues:])
-            response = result.split('\nRobot: ')[-1].replace('---', '')
-
-            await ctx.respond(response)
-
-        @self.bot.command(name="chat")
-        async def chat(ctx: niobot.Context, *, question: str):
-            result = self.conversationo.predict(
-                input=question,
-                history=self.history.replace(self.prompt_prefix, ''),  # Remove prefix from history
-                prefix=self.prompt_prefix
-            )
-
-            # Do some formatting and cleanup. This is not too pretty, but it works.
-            response = result.split('\nRobot: ')[-1].replace('---', '')
-            # Update history with the updated prompt.
-            self.history = '\nPerson:'.join(result.split('\nPerson:')[-self.keep_dialogues:])
-            response = result.split('\nRobot: ')[-1].replace('---', '')
-
-            await ctx.respond(response)
-
-        @self.bot.command(name="devel")
-        async def devel(ctx: niobot.Context, *, question: str):
-            result = self.conversationp.predict(
-                input=question,
-                history=self.history.replace(self.prompt_prefix, ''),  # Remove prefix from history
-                prefix=self.prompt_prefix
-            )
-
-            # Do some formatting and cleanup. This is not too pretty, but it works.
-            response = result.split('\nRobot: ')[-1].replace('---', '')
-            # Update history with the updated prompt.
-            self.history = '\nPerson:'.join(result.split('\nPerson:')[-self.keep_dialogues:])
-            response = result.split('\nRobot: ')[-1].replace('---', '')
-
-            await ctx.respond(response)
+      
+      
         @self.bot.command(name="stink")
         async def stink(ctx: niobot.Context):
             """Shows the latency between events"""
